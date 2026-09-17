@@ -294,6 +294,11 @@ document.getElementById('downloadBtn').addEventListener('click', ()=>{
 });
 document.getElementById('closeModalBtn').addEventListener('click', ()=> overlay.classList.add('hidden'));
 document.getElementById('buyBtn').addEventListener('click', ()=>{
+  if(GUMROAD_PRODUCT_PERMALINK === 'REPLACE_ME'){
+    document.getElementById('licenseMsg').textContent = 'La compra estará disponible en breve. Vuelve a intentarlo más tarde.';
+    document.getElementById('licenseMsg').className = 'error-msg';
+    return;
+  }
   window.open(`https://gumroad.com/l/${GUMROAD_PRODUCT_PERMALINK}`, '_blank');
 });
 document.getElementById('verifyBtn').addEventListener('click', async ()=>{
