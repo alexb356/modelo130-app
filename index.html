@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalculaModelo130 — Calculadora del pago fraccionado IRPF (Modelo 130) en PDF</title>
+<meta name="description" content="Calcula el pago fraccionado trimestral del IRPF (Modelo 130) para autónomos en estimación directa: rendimiento neto, 20%, retenciones y pagos anteriores. Genera el informe en PDF. Sin registro. Descarga por 2€.">
+<meta property="og:title" content="CalculaModelo130 — Calculadora del Modelo 130 IRPF trimestral">
+<meta property="og:description" content="Calcula tu pago fraccionado trimestral del IRPF (Modelo 130) y descarga el informe en PDF.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧾</text></svg>">
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1d4ed8; --ink:#1e293b; --muted:#64748b;
+    --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0; --green:#16a34a; --red:#dc2626;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  header.site{background:var(--card);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  header.site h1{font-size:20px;margin:0;display:flex;align-items:center;gap:8px;}
+  header.site p{margin:2px 0 0;color:var(--muted);font-size:13px;}
+  .badge{background:#ecfdf5;color:var(--green);border:1px solid #bbf7d0;font-size:12px;padding:4px 10px;border-radius:999px;font-weight:600;}
+  main{max-width:1200px;margin:0 auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media (max-width:900px){ main{grid-template-columns:1fr;} }
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+  .card h2{font-size:16px;margin:0 0 14px;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .row.single{grid-template-columns:1fr;}
+  label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px;}
+  input[type=text],input[type=number],input[type=date],select{
+    width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink);
+  }
+  fieldset{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;}
+  legend{font-size:13px;font-weight:700;padding:0 6px;color:var(--ink);}
+  .btn{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:600;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:var(--blue-dark);}
+  .btn-secondary{background:#eef2ff;color:var(--blue);}
+  .btn-block{width:100%;padding:12px;font-size:15px;}
+  .totals{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;}
+  .totals div{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;}
+  .totals .grand{font-size:16px;font-weight:700;color:var(--blue);border-top:1px solid var(--border);margin-top:6px;padding-top:8px;}
+  .warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:12px;padding:8px 10px;border-radius:8px;margin:10px 0;}
+  #preview{background:#fff;border:1px solid var(--border);border-radius:12px;padding:28px;font-size:13px;min-height:500px;line-height:1.5;}
+  #preview h3{font-size:16px;text-align:center;margin:0 0 4px;color:var(--blue);}
+  #preview .sub{text-align:center;color:var(--muted);font-size:12px;margin-bottom:18px;}
+  #preview table{width:100%;border-collapse:collapse;margin:14px 0;}
+  #preview th{text-align:left;font-size:11px;color:var(--muted);padding:6px 4px;border-bottom:1px solid var(--border);}
+  #preview td{padding:6px 4px;border-bottom:1px solid var(--border);}
+  .sample-note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:12px;padding:6px 10px;border-radius:8px;margin-bottom:14px;text-align:center;}
+  .overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;}
+  .modal{background:#fff;border-radius:14px;padding:26px;max-width:420px;width:100%;}
+  .modal h3{margin:0 0 8px;font-size:18px;}
+  .modal p{color:var(--muted);font-size:14px;line-height:1.5;}
+  .modal .price{font-size:28px;font-weight:800;color:var(--blue);margin:10px 0;}
+  .hidden{display:none !important;}
+  .error-msg{color:var(--red);font-size:13px;margin-top:6px;}
+  .success-msg{color:var(--green);font-size:13px;margin-top:6px;}
+  footer.site{max-width:1200px;margin:20px auto 40px;padding:0 24px;color:var(--muted);font-size:12px;}
+  footer.site .faq h3{font-size:14px;color:var(--ink);}
+  .privacy-note{display:flex;gap:8px;align-items:flex-start;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;font-size:12px;color:#1e3a8a;margin-top:14px;}
+  .disclaimer{font-size:11px;color:var(--muted);margin-top:8px;}
+  @media (max-width:600px){
+    .row{grid-template-columns:1fr;}
+    header.site{padding:14px 16px;}
+    main{padding:14px;gap:16px;}
+    .card{padding:14px;}
+    #preview{padding:18px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div>
+    <h1>🧾 CalculaModelo130</h1>
+    <p>Calculadora del pago fraccionado IRPF (Modelo 130) en PDF</p>
+  </div>
+  <span class="badge">🔒 100% en tu navegador — nada se sube a ningún servidor</span>
+</header>
+
+<main>
+  <div class="card">
+    <h2>1. Datos del trimestre</h2>
+    <fieldset>
+      <legend>Autónomo</legend>
+      <div class="row"><div><label>Nombre completo</label><input type="text" id="nombre"></div>
+      <div><label>NIF</label><input type="text" id="nif"></div></div>
+    </fieldset>
+    <div class="row">
+      <div><label>Trimestre</label>
+        <select id="trimestre">
+          <option value="1T">1T (enero-marzo) — plazo 1-20 abril</option>
+          <option value="2T">2T (enero-junio) — plazo 1-20 julio</option>
+          <option value="3T">3T (enero-septiembre) — plazo 1-20 octubre</option>
+          <option value="4T">4T (enero-diciembre) — plazo 1-30 enero</option>
+        </select>
+      </div>
+      <div><label>Ejercicio</label><input type="number" id="ejercicio" step="1" value="2026"></div>
+    </div>
+    <fieldset>
+      <legend>Importes acumulados del año hasta este trimestre</legend>
+      <div class="row single">
+        <div><label>Ingresos íntegros de la actividad</label><input type="number" id="ingresos" min="0" step="0.01" value="0"></div>
+      </div>
+      <div class="row single">
+        <div><label>Gastos deducibles de la actividad</label><input type="number" id="gastos" min="0" step="0.01" value="0"></div>
+      </div>
+      <div class="row">
+        <div><label>Retenciones soportadas (facturas con retención)</label><input type="number" id="retenciones" min="0" step="0.01" value="0"></div>
+        <div><label>Pagos fraccionados ya ingresados este año</label><input type="number" id="pagosAnteriores" min="0" step="0.01" value="0"></div>
+      </div>
+    </fieldset>
+    <div id="avisoRendimientoNegativo" class="warn hidden">⚠️ El rendimiento neto acumulado es negativo o cero. No hay pago fraccionado que ingresar en este trimestre (resultado a declarar: 0,00 €), pero sigue siendo obligatorio presentar el modelo si estás en estimación directa.</div>
+
+    <div class="totals" id="calcTotals"></div>
+    <div class="disclaimer">Cálculo orientativo del pago fraccionado en estimación directa (normal o simplificada), sin aplicar reducciones específicas de inicio de actividad ni particularidades de estimación objetiva (módulos). No sustituye la presentación oficial en la Sede Electrónica de la AEAT ni el cálculo de tu gestoría.</div>
+  </div>
+
+  <div class="card">
+    <h2>Vista previa del informe</h2>
+    <div class="sample-note">Vista previa en pantalla — el PDF final se descarga tras el desbloqueo (2€, pago único)</div>
+    <div id="preview"></div>
+    <button class="btn btn-primary btn-block" id="downloadBtn" type="button" style="margin-top:16px;">⬇️ Descargar PDF</button>
+    <div class="privacy-note">🔒 Todos tus datos se procesan localmente en tu navegador. Nada se envía ni se guarda en ningún servidor.</div>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="faq">
+    <h3>Preguntas frecuentes</h3>
+    <p><strong>¿Qué es el Modelo 130?</strong> Es la autoliquidación trimestral del pago fraccionado del IRPF para autónomos en estimación directa. Es un adelanto a cuenta de la declaración de la renta anual.</p>
+    <p><strong>¿Cómo se calcula?</strong> Sobre el rendimiento neto acumulado del año (ingresos menos gastos deducibles) se aplica el 20%, y al resultado se le restan las retenciones soportadas y los pagos fraccionados ya ingresados en trimestres anteriores del mismo año.</p>
+    <p><strong>¿Sirve para estimación objetiva (módulos)?</strong> No. Esta calculadora está pensada para estimación directa. Los autónomos en módulos calculan el pago fraccionado de otra forma.</p>
+    <p><strong>¿Es gratis?</strong> Calcular y previsualizar es gratis. Descargar el PDF final cuesta 2€ (pago único).</p>
+  </div>
+  <p style="margin-top:20px;">CalculaModelo130 — herramienta independiente, no sustituye asesoramiento fiscal profesional ni la presentación oficial ante la AEAT.</p>
+</footer>
+
+<div class="overlay hidden" id="overlay">
+  <div class="modal">
+    <h3>Desbloquear descarga PDF</h3>
+    <p>Descarga tu informe del pago fraccionado (Modelo 130) en PDF, listo para revisar, con un pago único.</p>
+    <div class="price">2,00 €</div>
+    <button class="btn btn-primary btn-block" id="buyBtn" type="button">Pagar y obtener código</button>
+    <p style="margin-top:16px;">¿Ya tienes un código? Pégalo aquí:</p>
+    <input type="text" id="licenseInput" placeholder="Código de licencia">
+    <button class="btn btn-secondary btn-block" id="verifyBtn" type="button" style="margin-top:8px;">Verificar y desbloquear</button>
+    <div id="licenseMsg"></div>
+    <button class="btn" id="closeModalBtn" type="button" style="margin-top:14px;background:transparent;color:var(--muted);">Cerrar</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const GUMROAD_PRODUCT_PERMALINK = "REPLACE_ME";
+const GUMROAD_PRODUCT_ID = "REPLACE_ME";
+
+let unlocked = localStorage.getItem('m130_unlocked') === '1';
+
+function val(id){ return document.getElementById(id).value; }
+function num(id){ const v = parseFloat(document.getElementById(id).value); return isFinite(v)?v:0; }
+function fmtMoney(n){ return (isFinite(n)?n:0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €'; }
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+const PLAZOS = {
+  '1T':'1 al 20 de abril',
+  '2T':'1 al 20 de julio',
+  '3T':'1 al 20 de octubre',
+  '4T':'1 al 30 de enero (año siguiente)'
+};
+
+function compute(){
+  const ingresos = num('ingresos');
+  const gastos = num('gastos');
+  const retenciones = num('retenciones');
+  const pagosAnteriores = num('pagosAnteriores');
+
+  const rendimientoNeto = ingresos - gastos;
+  const rendimientoPositivo = Math.max(rendimientoNeto, 0);
+  const pagoFraccionado = rendimientoPositivo * 0.20;
+  const resultadoPrevio = pagoFraccionado - retenciones - pagosAnteriores;
+  const resultado = Math.max(resultadoPrevio, 0);
+
+  document.getElementById('avisoRendimientoNegativo').classList.toggle('hidden', rendimientoNeto > 0);
+
+  return { ingresos, gastos, retenciones, pagosAnteriores, rendimientoNeto, rendimientoPositivo, pagoFraccionado, resultadoPrevio, resultado };
+}
+
+function renderAll(){
+  const c = compute();
+  const t = document.getElementById('calcTotals');
+  t.innerHTML = `
+    <div><span>Rendimiento neto acumulado</span><span>${fmtMoney(c.rendimientoNeto)}</span></div>
+    <div><span>20% del rendimiento neto</span><span>${fmtMoney(c.pagoFraccionado)}</span></div>
+    <div><span>Retenciones soportadas</span><span>-${fmtMoney(c.retenciones)}</span></div>
+    <div><span>Pagos fraccionados anteriores</span><span>-${fmtMoney(c.pagosAnteriores)}</span></div>
+    <div class="grand"><span>Resultado a ingresar</span><span>${fmtMoney(c.resultado)}</span></div>
+  `;
+
+  const trimestre = val('trimestre');
+  const p = document.getElementById('preview');
+  p.innerHTML = `
+    <h3>MODELO 130 — PAGO FRACCIONADO IRPF</h3>
+    <div class="sub">Trimestre ${trimestre} · Ejercicio ${escapeHtml(val('ejercicio'))} · Emitido el ${new Date().toLocaleDateString('es-ES')}</div>
+    <p><b>Autónomo:</b> ${escapeHtml(val('nombre'))||'—'} (NIF ${escapeHtml(val('nif'))||'—'})</p>
+    <p><b>Plazo de presentación:</b> ${PLAZOS[trimestre]}</p>
+    <table>
+      <thead><tr><th>Concepto</th><th style="text-align:right;">Importe</th></tr></thead>
+      <tbody>
+        <tr><td>Ingresos íntegros acumulados</td><td style="text-align:right;">${fmtMoney(c.ingresos)}</td></tr>
+        <tr><td>Gastos deducibles acumulados</td><td style="text-align:right;">${fmtMoney(c.gastos)}</td></tr>
+        <tr><td>Rendimiento neto acumulado</td><td style="text-align:right;">${fmtMoney(c.rendimientoNeto)}</td></tr>
+        <tr><td>20% del rendimiento neto</td><td style="text-align:right;">${fmtMoney(c.pagoFraccionado)}</td></tr>
+        <tr><td>Retenciones soportadas</td><td style="text-align:right;">-${fmtMoney(c.retenciones)}</td></tr>
+        <tr><td>Pagos fraccionados anteriores del año</td><td style="text-align:right;">-${fmtMoney(c.pagosAnteriores)}</td></tr>
+        <tr><td><b>RESULTADO A INGRESAR</b></td><td style="text-align:right;"><b>${fmtMoney(c.resultado)}</b></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:#64748b;">Cálculo orientativo para estimación directa. No aplica reducciones de inicio de actividad ni estimación objetiva (módulos).</p>
+  `;
+}
+
+document.querySelectorAll('main input, main select').forEach(el=>{
+  el.addEventListener('input', renderAll);
+  el.addEventListener('change', renderAll);
+});
+
+function generatePDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  const c = compute();
+  const trimestre = val('trimestre');
+  let y = 50;
+
+  doc.setFontSize(16); doc.setFont(undefined,'bold'); doc.setTextColor(30,41,59);
+  doc.text('MODELO 130 — PAGO FRACCIONADO IRPF', 297, y, {align:'center', maxWidth:500});
+  y += 26;
+  doc.setFont(undefined,'normal'); doc.setFontSize(10); doc.setTextColor(100,116,137);
+  doc.text(`Trimestre ${trimestre} · Ejercicio ${val('ejercicio')} · Emitido el ${new Date().toLocaleDateString('es-ES')}`, 297, y, {align:'center'});
+  y += 30;
+
+  doc.setFontSize(10); doc.setTextColor(30,41,59);
+  const lines = [
+    `Autónomo: ${val('nombre')||'—'} (NIF ${val('nif')||'—'})`,
+    `Plazo de presentación: ${PLAZOS[trimestre]}`,
+  ];
+  lines.forEach((l,i)=> doc.text(l, 40, y+i*16));
+  y += lines.length*16 + 20;
+
+  doc.setDrawColor(226,232,240);
+  doc.line(40, y, 555, y);
+  y += 16;
+  doc.setFont(undefined,'bold');
+  doc.text('Concepto', 40, y);
+  doc.text('Importe', 555, y, {align:'right'});
+  y += 10;
+  doc.line(40, y, 555, y);
+  y += 16;
+  doc.setFont(undefined,'normal');
+  const rows = [
+    ['Ingresos íntegros acumulados', fmtMoney(c.ingresos)],
+    ['Gastos deducibles acumulados', fmtMoney(c.gastos)],
+    ['Rendimiento neto acumulado', fmtMoney(c.rendimientoNeto)],
+    ['20% del rendimiento neto', fmtMoney(c.pagoFraccionado)],
+    ['Retenciones soportadas', '-' + fmtMoney(c.retenciones)],
+    ['Pagos fraccionados anteriores del año', '-' + fmtMoney(c.pagosAnteriores)],
+  ];
+  rows.forEach(([label, valor])=>{
+    doc.text(label, 40, y);
+    doc.text(valor, 555, y, {align:'right'});
+    y += 18;
+  });
+  doc.line(40, y, 555, y);
+  y += 16;
+  doc.setFont(undefined,'bold'); doc.setFontSize(12); doc.setTextColor(37,99,235);
+  doc.text('RESULTADO A INGRESAR', 40, y);
+  doc.text(fmtMoney(c.resultado), 555, y, {align:'right'});
+  y += 30;
+
+  doc.setFont(undefined,'normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  doc.text('Cálculo orientativo para estimación directa. No aplica reducciones de inicio de actividad ni estimación objetiva (módulos). No sustituye la presentación oficial en la Sede Electrónica de la AEAT ni el cálculo de tu gestoría.', 40, y, {maxWidth:500});
+
+  doc.setFontSize(8); doc.setTextColor(180,188,199);
+  doc.text('Generado con CalculaModelo130', 40, 800);
+
+  doc.save(`Modelo130_${trimestre}_${(val('nombre')||'autonomo').replace(/\s+/g,'_')}.pdf`);
+}
+
+const overlay = document.getElementById('overlay');
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  if(unlocked){ generatePDF(); }
+  else { overlay.classList.remove('hidden'); }
+});
+document.getElementById('closeModalBtn').addEventListener('click', ()=> overlay.classList.add('hidden'));
+document.getElementById('buyBtn').addEventListener('click', ()=>{
+  window.open(`https://gumroad.com/l/${GUMROAD_PRODUCT_PERMALINK}`, '_blank');
+});
+document.getElementById('verifyBtn').addEventListener('click', async ()=>{
+  const key = document.getElementById('licenseInput').value.trim();
+  const msg = document.getElementById('licenseMsg');
+  msg.textContent = ''; msg.className = '';
+  if(!key){ msg.textContent = 'Introduce tu código de licencia.'; msg.className='error-msg'; return; }
+  document.getElementById('verifyBtn').textContent = 'Verificando...';
+  try{
+    const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body: `product_id=${encodeURIComponent(GUMROAD_PRODUCT_ID)}&license_key=${encodeURIComponent(key)}&increment_uses_count=false`
+    });
+    const data = await res.json();
+    if(data.success){
+      unlocked = true;
+      localStorage.setItem('m130_unlocked','1');
+      msg.textContent = '¡Código válido! Descargando...';
+      msg.className = 'success-msg';
+      setTimeout(()=>{ overlay.classList.add('hidden'); generatePDF(); }, 600);
+    } else {
+      msg.textContent = data.message || 'Código no válido.';
+      msg.className = 'error-msg';
+    }
+  } catch(e){
+    msg.textContent = 'Error verificando el código. Comprueba tu conexión e inténtalo de nuevo.';
+    msg.className = 'error-msg';
+  } finally {
+    document.getElementById('verifyBtn').textContent = 'Verificar y desbloquear';
+  }
+});
+
+renderAll();
+</script>
+</body>
+</html>
